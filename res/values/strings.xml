@@ -19,6 +19,7 @@
     <string name="app_lock_credentials_type_password">Password</string>
     <string name="app_lock_credentials_type_pattern">Pattern</string>
     <string name="app_lock_credentials_unavailable">App Locker is not installed on this device</string>
+    <string name="app_lock_enable_no_password">Set a privacy password so locked apps can be unlocked</string>
     <string name="app_lock_relock_title">Relock behavior</string>
     <string name="app_lock_relock_summary">When locked apps should require authentication again</string>
     <string name="app_lock_relock_summary_on_leave">When leaving the app</string>

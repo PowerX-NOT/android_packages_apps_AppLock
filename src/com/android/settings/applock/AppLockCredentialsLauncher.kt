@@ -12,7 +12,7 @@ import com.android.applock.R
 
 /** Registers the privacy-password setup flow and refreshes summary on return. */
 class AppLockCredentialsLauncher(
-    fragment: Fragment,
+    private val fragment: Fragment,
     private val onReturned: () -> Unit,
 ) {
     private val launcher = fragment.registerForActivityResult(

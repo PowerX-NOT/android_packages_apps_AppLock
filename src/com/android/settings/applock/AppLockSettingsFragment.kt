@@ -5,6 +5,7 @@
 package com.android.settings.applock
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.preference.Preference
 import androidx.preference.SwitchPreferenceCompat
 import com.android.applock.R
@@ -54,6 +55,13 @@ class AppLockSettingsFragment : DashboardFragment() {
         switch.isChecked = manager.isEnabled
         switch.setOnPreferenceChangeListener { _, newValue ->
             val enabled = newValue as Boolean
+            if (enabled && !AppLockCredentialsHelper.isSetup(requireContext())) {
+                Toast.makeText(
+                    requireContext(),
+                    R.string.app_lock_enable_no_password,
+                    Toast.LENGTH_LONG,
+                ).show()
+            }
             manager.setEnabled(enabled)
             updateDependentPreferences(enabled)
             true
