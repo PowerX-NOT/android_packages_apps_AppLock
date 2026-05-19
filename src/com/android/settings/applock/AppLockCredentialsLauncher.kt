@@ -4,13 +4,10 @@
 
 package com.android.settings.applock
 
-import android.content.ActivityNotFoundException
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import com.android.applock.R
 
-/** Registers the privacy-password setup flow and refreshes summary on return. */
+/** Registers the in-package privacy-password setup flow. */
 class AppLockCredentialsLauncher(
     private val fragment: Fragment,
     private val onReturned: () -> Unit,
@@ -22,23 +19,6 @@ class AppLockCredentialsLauncher(
     }
 
     fun launch() {
-        val context = fragment.requireContext()
-        if (!AppLockCredentialsHelper.canLaunchSetup(context)) {
-            Toast.makeText(
-                context,
-                R.string.app_lock_credentials_unavailable,
-                Toast.LENGTH_LONG,
-            ).show()
-            return
-        }
-        try {
-            launcher.launch(AppLockCredentialsHelper.createSetupIntent())
-        } catch (_: ActivityNotFoundException) {
-            Toast.makeText(
-                context,
-                R.string.app_lock_credentials_unavailable,
-                Toast.LENGTH_LONG,
-            ).show()
-        }
+        launcher.launch(AppLockCredentialsHelper.createSetupIntent(fragment.requireContext()))
     }
 }
