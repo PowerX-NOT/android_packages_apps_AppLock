@@ -14,9 +14,19 @@ import com.android.settings.dashboard.DashboardFragment
 /** Root App Lock settings screen (Settings dashboard entry). */
 class AppLockSettingsFragment : DashboardFragment() {
 
+    private lateinit var credentialsLauncher: AppLockCredentialsLauncher
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        credentialsLauncher = AppLockCredentialsLauncher(this) {
+            refreshCredentialsSummary()
+        }
+    }
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferences(savedInstanceState, rootKey)
         bindEnableSwitch()
+        bindCredentialsPreference()
     }
 
     override fun onResume() {
@@ -24,6 +34,7 @@ class AppLockSettingsFragment : DashboardFragment() {
         bindEnableSwitch()
         refreshLockedAppsSummary()
         refreshRelockSummary()
+        refreshCredentialsSummary()
     }
 
     private fun bindEnableSwitch() {
@@ -50,6 +61,14 @@ class AppLockSettingsFragment : DashboardFragment() {
         updateDependentPreferences(manager.isEnabled)
         refreshLockedAppsSummary()
         refreshRelockSummary()
+        refreshCredentialsSummary()
+    }
+
+    private fun bindCredentialsPreference() {
+        findPreference<Preference>(KEY_CREDENTIALS)?.setOnPreferenceClickListener {
+            credentialsLauncher.launch()
+            true
+        }
     }
 
     private fun updateDependentPreferences(appLockEnabled: Boolean) {
@@ -58,7 +77,11 @@ class AppLockSettingsFragment : DashboardFragment() {
             findPreference<Preference>(KEY_LOCKED_APPS)?.summary =
                 getString(R.string.app_lock_enable_first)
         }
-        findPreference<Preference>(KEY_CREDENTIALS)?.isEnabled = false
+        findPreference<Preference>(KEY_CREDENTIALS)?.isEnabled = appLockEnabled
+        if (!appLockEnabled) {
+            findPreference<Preference>(KEY_CREDENTIALS)?.summary =
+                getString(R.string.app_lock_credentials_summary)
+        }
         val relock = findPreference<Preference>(KEY_RELOCK)
         relock?.isEnabled = appLockEnabled
         if (!appLockEnabled) {
@@ -71,6 +94,23 @@ class AppLockSettingsFragment : DashboardFragment() {
         if (!relock.isEnabled) return
         val behavior = AppLockSettingsSecure.getLockBehavior(requireContext())
         relock.summary = getString(AppLockRelockFragment.summaryForBehavior(behavior))
+    }
+
+    private fun refreshCredentialsSummary() {
+        val credentials = findPreference<Preference>(KEY_CREDENTIALS) ?: return
+        if (!credentials.isEnabled) return
+        val context = requireContext()
+        if (!AppLockCredentialsHelper.isSetup(context)) {
+            credentials.summary = getString(R.string.app_lock_credentials_not_set)
+            return
+        }
+        val typeName = AppLockCredentialsHelper.securityTypeName(context)
+            ?: getString(R.string.app_lock_credentials_summary)
+        credentials.summary = if (AppLockCredentialsHelper.isBiometricEnabled(context)) {
+            getString(R.string.app_lock_credentials_set_with_biometric, typeName)
+        } else {
+            getString(R.string.app_lock_credentials_set, typeName)
+        }
     }
 
     private fun refreshLockedAppsSummary() {
