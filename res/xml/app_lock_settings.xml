@@ -6,10 +6,11 @@
         android:key="app_lock_cat_general"
         android:title="@string/app_lock_category_general">
 
-        <Preference
+        <SwitchPreferenceCompat
             android:key="app_lock_enable"
             android:title="@string/app_lock_enable_title"
-            android:summary="@string/app_lock_enable_summary" />
+            android:summary="@string/app_lock_enable_summary"
+            android:defaultValue="false" />
 
         <Preference
             android:key="app_lock_locked_apps"
