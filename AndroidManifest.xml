@@ -3,6 +3,7 @@
     package="com.android.applock">
 
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <uses-permission android:name="com.android.applocker.permission.MANAGE_CREDENTIALS" />
 
     <queries>
         <package android:name="com.android.applocker" />

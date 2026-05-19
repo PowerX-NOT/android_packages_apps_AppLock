@@ -6,6 +6,7 @@ package com.android.settings.applock
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Binder
 import android.os.UserHandle
 import android.provider.Settings
@@ -46,8 +47,28 @@ object AppLockCredentialsHelper {
         }
     }
 
+    fun isAppLockerInstalled(context: Context): Boolean {
+        return try {
+            context.packageManager.getPackageInfo(PACKAGE_APPLOCKER, 0)
+            true
+        } catch (_: PackageManager.NameNotFoundException) {
+            false
+        }
+    }
+
+    fun canLaunchSetup(context: Context): Boolean {
+        if (!isAppLockerInstalled(context)) return false
+        val intent = createSetupIntent()
+        return context.packageManager.resolveActivity(
+            intent,
+            PackageManager.MATCH_DEFAULT_ONLY,
+        ) != null
+    }
+
     fun createSetupIntent(): Intent =
-        Intent(ACTION_SETUP_CREDENTIALS).setClassName(PACKAGE_APPLOCKER, CLASS_SETUP)
+        Intent(ACTION_SETUP_CREDENTIALS)
+            .setClassName(PACKAGE_APPLOCKER, CLASS_SETUP)
+            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
     private inline fun <T> withClearCallingIdentity(block: () -> T): T {
         val token = Binder.clearCallingIdentity()

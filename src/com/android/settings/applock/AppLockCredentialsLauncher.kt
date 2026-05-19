@@ -22,11 +22,20 @@ class AppLockCredentialsLauncher(
     }
 
     fun launch() {
+        val context = fragment.requireContext()
+        if (!AppLockCredentialsHelper.canLaunchSetup(context)) {
+            Toast.makeText(
+                context,
+                R.string.app_lock_credentials_unavailable,
+                Toast.LENGTH_LONG,
+            ).show()
+            return
+        }
         try {
             launcher.launch(AppLockCredentialsHelper.createSetupIntent())
         } catch (_: ActivityNotFoundException) {
             Toast.makeText(
-                fragment.requireContext(),
+                context,
                 R.string.app_lock_credentials_unavailable,
                 Toast.LENGTH_LONG,
             ).show()
