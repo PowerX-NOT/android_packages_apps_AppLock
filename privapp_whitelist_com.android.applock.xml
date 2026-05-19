@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<permissions>
+    <privapp-permissions package="com.android.applock">
+        <permission name="com.android.applocker.permission.MANAGE_CREDENTIALS"/>
+    </privapp-permissions>
+</permissions>

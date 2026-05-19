@@ -2,12 +2,23 @@ package {
     default_applicable_licenses: ["Android-Apache-2.0"],
 }
 
+prebuilt_etc {
+    name: "privapp_whitelist_com.android.applock",
+    system_ext_specific: true,
+    sub_dir: "permissions",
+    src: "privapp_whitelist_com.android.applock.xml",
+    filename_from_src: true,
+}
+
 android_app {
     name: "AppLock",
     platform_apis: true,
     certificate: "platform",
     system_ext_specific: true,
     privileged: true,
+    required: [
+        "privapp_whitelist_com.android.applock",
+    ],
     srcs: [
         "src/**/*.kt",
         "src/**/*.java",
