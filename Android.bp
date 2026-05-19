@@ -23,5 +23,7 @@ android_app {
         "androidx.lifecycle_lifecycle-runtime-ktx",
         "androidx.preference_preference",
         "kotlin-stdlib",
+        "kotlinx_coroutines_android",
+        "kotlinx_coroutines",
     ],
 }

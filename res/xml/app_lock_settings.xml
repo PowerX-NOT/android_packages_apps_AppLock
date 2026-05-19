@@ -16,6 +16,7 @@
             android:key="app_lock_locked_apps"
             android:title="@string/app_lock_locked_apps_title"
             android:summary="@string/app_lock_locked_apps_summary"
+            android:fragment="com.android.settings.applock.AppLockLockedAppsFragment"
             android:enabled="false" />
 
         <Preference

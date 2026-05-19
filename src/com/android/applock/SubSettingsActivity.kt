@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.android.settings.applock.AppLockLockedAppsFragment
 import com.android.settings.core.SubSettingLauncher
 import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity
 
@@ -39,6 +40,7 @@ class SubSettingsActivity : CollapsingToolbarBaseActivity(),
 
     private fun newSubSettingsFragment(className: String?, args: Bundle?): Fragment? {
         return when (className) {
+            AppLockLockedAppsFragment::class.java.name -> AppLockLockedAppsFragment()
             else -> null
         }
     }

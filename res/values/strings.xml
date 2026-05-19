@@ -7,6 +7,9 @@
     <string name="app_lock_enable_summary">Protect selected apps with a privacy password or biometrics</string>
     <string name="app_lock_locked_apps_title">Locked apps</string>
     <string name="app_lock_locked_apps_summary">Choose which apps require authentication</string>
+    <string name="app_lock_locked_apps_summary_count">%1$d apps locked — tap to change</string>
+    <string name="app_lock_locked_apps_list_category">Apps</string>
+    <string name="app_lock_locked_apps_empty">No launchable apps found</string>
     <string name="app_lock_credentials_title">Privacy password</string>
     <string name="app_lock_credentials_summary">Set or change the password used for locked apps</string>
     <string name="app_lock_relock_title">Relock behavior</string>

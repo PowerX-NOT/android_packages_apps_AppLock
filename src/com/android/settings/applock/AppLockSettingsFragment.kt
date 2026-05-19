@@ -22,6 +22,7 @@ class AppLockSettingsFragment : DashboardFragment() {
     override fun onResume() {
         super.onResume()
         bindEnableSwitch()
+        refreshLockedAppsSummary()
     }
 
     private fun bindEnableSwitch() {
@@ -46,19 +47,29 @@ class AppLockSettingsFragment : DashboardFragment() {
             true
         }
         updateDependentPreferences(manager.isEnabled)
+        refreshLockedAppsSummary()
     }
 
     private fun updateDependentPreferences(appLockEnabled: Boolean) {
-        val lockedApps = findPreference<Preference>(KEY_LOCKED_APPS)
-        lockedApps?.isEnabled = appLockEnabled
-        lockedApps?.summary = if (appLockEnabled) {
-            getString(R.string.app_lock_locked_apps_summary)
-        } else {
-            getString(R.string.app_lock_enable_first)
+        findPreference<Preference>(KEY_LOCKED_APPS)?.isEnabled = appLockEnabled
+        if (!appLockEnabled) {
+            findPreference<Preference>(KEY_LOCKED_APPS)?.summary =
+                getString(R.string.app_lock_enable_first)
         }
-
         findPreference<Preference>(KEY_CREDENTIALS)?.isEnabled = false
         findPreference<Preference>(KEY_RELOCK)?.isEnabled = false
+    }
+
+    private fun refreshLockedAppsSummary() {
+        val lockedApps = findPreference<Preference>(KEY_LOCKED_APPS) ?: return
+        if (!lockedApps.isEnabled) return
+        val manager = AppLockBinder.getOrNull(requireContext()) ?: return
+        val count = manager.lockedPackages.size
+        lockedApps.summary = if (count == 0) {
+            getString(R.string.app_lock_locked_apps_summary)
+        } else {
+            getString(R.string.app_lock_locked_apps_summary_count, count)
+        }
     }
 
     override fun getMetricsCategory() = MetricsProto.MetricsEvent.EVOLVER
