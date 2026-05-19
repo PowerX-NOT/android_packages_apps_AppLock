@@ -29,6 +29,7 @@
             android:key="app_lock_relock"
             android:title="@string/app_lock_relock_title"
             android:summary="@string/app_lock_relock_summary"
+            android:fragment="com.android.settings.applock.AppLockRelockFragment"
             android:enabled="false" />
     </PreferenceCategory>
 

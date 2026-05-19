@@ -14,6 +14,21 @@
     <string name="app_lock_credentials_summary">Set or change the password used for locked apps</string>
     <string name="app_lock_relock_title">Relock behavior</string>
     <string name="app_lock_relock_summary">When locked apps should require authentication again</string>
+    <string name="app_lock_relock_summary_on_leave">When leaving the app</string>
+    <string name="app_lock_relock_summary_timeout">After a period of inactivity</string>
+    <string name="app_lock_relock_summary_screen_off">When the screen turns off</string>
+    <string name="app_lock_relock_summary_on_kill">When the app is closed</string>
+    <string name="app_lock_relock_behavior_category">Relock when</string>
+    <string name="app_lock_relock_on_leave_title">Leaving the app</string>
+    <string name="app_lock_relock_on_leave_summary">Require authentication when you open another app or go home</string>
+    <string name="app_lock_relock_timeout_behavior_title">After inactivity</string>
+    <string name="app_lock_relock_timeout_behavior_summary">Require authentication after the app has been in the background for a while</string>
+    <string name="app_lock_relock_screen_off_title">Screen off</string>
+    <string name="app_lock_relock_screen_off_summary">Require authentication when the screen turns off</string>
+    <string name="app_lock_relock_on_kill_title">App closed</string>
+    <string name="app_lock_relock_on_kill_summary">Require authentication when the app is removed from recents</string>
+    <string name="app_lock_relock_timeout_title">Inactivity timeout</string>
+    <string name="app_lock_relock_timeout_summary">How long an app can stay in the background before it locks again</string>
     <string name="app_lock_enable_first">Turn on App Lock to choose which apps to protect</string>
     <string name="app_lock_service_unavailable">App Lock service is not available on this build</string>
 </resources>

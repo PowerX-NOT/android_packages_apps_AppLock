@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/app_lock_relock_title">
+
+    <PreferenceCategory
+        android:key="app_lock_relock_behavior"
+        android:title="@string/app_lock_relock_behavior_category" />
+
+    <ListPreference
+        android:key="app_lock_relock_timeout"
+        android:title="@string/app_lock_relock_timeout_title"
+        android:summary="@string/app_lock_relock_timeout_summary"
+        android:entries="@array/app_lock_relock_timeout_entries"
+        android:entryValues="@array/app_lock_relock_timeout_values"
+        android:defaultValue="30" />
+
+</PreferenceScreen>

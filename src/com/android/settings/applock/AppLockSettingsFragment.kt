@@ -23,6 +23,7 @@ class AppLockSettingsFragment : DashboardFragment() {
         super.onResume()
         bindEnableSwitch()
         refreshLockedAppsSummary()
+        refreshRelockSummary()
     }
 
     private fun bindEnableSwitch() {
@@ -48,6 +49,7 @@ class AppLockSettingsFragment : DashboardFragment() {
         }
         updateDependentPreferences(manager.isEnabled)
         refreshLockedAppsSummary()
+        refreshRelockSummary()
     }
 
     private fun updateDependentPreferences(appLockEnabled: Boolean) {
@@ -57,7 +59,18 @@ class AppLockSettingsFragment : DashboardFragment() {
                 getString(R.string.app_lock_enable_first)
         }
         findPreference<Preference>(KEY_CREDENTIALS)?.isEnabled = false
-        findPreference<Preference>(KEY_RELOCK)?.isEnabled = false
+        val relock = findPreference<Preference>(KEY_RELOCK)
+        relock?.isEnabled = appLockEnabled
+        if (!appLockEnabled) {
+            relock?.summary = getString(R.string.app_lock_relock_summary)
+        }
+    }
+
+    private fun refreshRelockSummary() {
+        val relock = findPreference<Preference>(KEY_RELOCK) ?: return
+        if (!relock.isEnabled) return
+        val behavior = AppLockSettingsSecure.getLockBehavior(requireContext())
+        relock.summary = getString(AppLockRelockFragment.summaryForBehavior(behavior))
     }
 
     private fun refreshLockedAppsSummary() {
