@@ -11,8 +11,6 @@ import androidx.preference.PreferenceCategory
 import com.android.applock.R
 import com.android.internal.logging.nano.MetricsProto
 import com.android.settings.dashboard.DashboardFragment
-import com.android.settingslib.widget.SelectorWithWidgetPreference
-
 /** Choose when unlocked apps should require authentication again. */
 class AppLockRelockFragment : DashboardFragment() {
 
@@ -34,7 +32,7 @@ class AppLockRelockFragment : DashboardFragment() {
         category.removeAll()
         for (option in BEHAVIOR_OPTIONS) {
             category.addPreference(
-                SelectorWithWidgetPreference(requireContext(), true).apply {
+                AppLockRelockBehaviorPreference(requireContext()).apply {
                     key = "app_lock_relock_behavior_${option.value}"
                     title = getString(option.titleRes)
                     summary = getString(option.summaryRes)
@@ -55,7 +53,7 @@ class AppLockRelockFragment : DashboardFragment() {
 
     private fun updateBehaviorChecks(category: PreferenceCategory, selected: Int) {
         for (option in BEHAVIOR_OPTIONS) {
-            val pref = category.findPreference<SelectorWithWidgetPreference>(
+            val pref = category.findPreference<AppLockRelockBehaviorPreference>(
                 "app_lock_relock_behavior_${option.value}",
             ) ?: continue
             pref.isChecked = option.value == selected
