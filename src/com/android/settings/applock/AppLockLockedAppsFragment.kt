@@ -25,6 +25,11 @@ class AppLockLockedAppsFragment : DashboardFragment() {
         loadAppList()
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadAppList()
+    }
+
     private fun loadAppList() {
         val manager = AppLockBinder.getOrNull(requireContext()) ?: return
         val category = findPreference<PreferenceCategory>(KEY_LIST) ?: return

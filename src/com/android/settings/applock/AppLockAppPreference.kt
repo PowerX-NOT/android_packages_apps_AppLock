@@ -5,6 +5,7 @@
 package com.android.settings.applock
 
 import android.content.Context
+import android.view.View
 import androidx.preference.PreferenceViewHolder
 import com.android.applock.R
 import com.android.settingslib.widget.SelectorWithWidgetPreference
@@ -15,6 +16,14 @@ class AppLockAppPreference(context: Context) : SelectorWithWidgetPreference(cont
     init {
         layoutResource = R.layout.app_lock_preference_app_row
         setExtraWidgetOnClickListener(null)
+    }
+
+    override fun onClick() {
+        // SelectorWithWidgetPreference.onClick() does not call CheckBoxPreference.onClick().
+        val newChecked = !isChecked
+        if (callChangeListener(newChecked)) {
+            isChecked = newChecked
+        }
     }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
@@ -29,12 +38,14 @@ class AppLockAppPreference(context: Context) : SelectorWithWidgetPreference(cont
             return
         }
 
+        val toggleClickListener = View.OnClickListener { performClick() }
+
         holder.itemView.isClickable = true
         holder.itemView.isFocusable = true
-        holder.itemView.setOnClickListener { onClick() }
+        holder.itemView.setOnClickListener(toggleClickListener)
 
         widgetFrame?.isClickable = true
         widgetFrame?.isFocusable = true
-        widgetFrame?.setOnClickListener { onClick() }
+        widgetFrame?.setOnClickListener(toggleClickListener)
     }
 }
