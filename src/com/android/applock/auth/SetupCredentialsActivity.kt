@@ -22,6 +22,7 @@ import com.android.applock.auth.ui.PasswordScreen
 import com.android.applock.auth.ui.PatternScreen
 import com.android.applock.auth.ui.SecuritySetupScreen
 import com.android.applock.auth.ui.theme.AppLockAuthTheme
+import com.android.applock.R
 
 /** Set or change the privacy password used by App Lock and Sandbox auth. */
 class SetupCredentialsActivity : ComponentActivity() {

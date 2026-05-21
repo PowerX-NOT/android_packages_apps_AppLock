@@ -81,7 +81,7 @@ class AppLockLockedAppsFragment : DashboardFragment() {
         }
     }
 
-    override fun getMetricsCategory() = MetricsProto.MetricsEvent.EVOLVER
+    override fun getMetricsCategory() = MetricsProto.MetricsEvent.SECURITY
 
     override fun getPreferenceScreenResId() = R.xml.app_lock_locked_apps
 
