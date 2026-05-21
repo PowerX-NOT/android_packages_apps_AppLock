@@ -4,9 +4,10 @@
 
 package com.android.applock.auth.security
 
+import android.app.AppLockManager
 import android.content.Context
 import android.hardware.biometrics.BiometricManager
-import android.os.Binder
+import android.os.RemoteException
 import android.provider.Settings
 import java.security.MessageDigest
 
@@ -17,8 +18,12 @@ enum class SecurityType {
     PATTERN,
 }
 
-/** Privacy password storage for App Lock (independent {@code applock_*} Secure keys). */
+/** Privacy password storage for App Lock ({@code applock_*} Secure keys). */
 class AppLockSecurityManager(private val context: Context) {
+
+    private val appLockManager: AppLockManager? by lazy {
+        context.getSystemService(AppLockManager::class.java)
+    }
 
     fun getSecurityType(): SecurityType {
         val type = readSecurityType() ?: return SecurityType.NONE
@@ -122,14 +127,21 @@ class AppLockSecurityManager(private val context: Context) {
         return Settings.Secure.getInt(resolver, legacyKey, 0)
     }
 
-    private fun putSecure(key: String, value: String): Boolean =
-        withClearCallingIdentity {
-            Settings.Secure.putString(context.contentResolver, key, value)
+    private fun putSecure(key: String, value: String): Boolean {
+        val mgr = appLockManager ?: return false
+        return try {
+            mgr.putSecureString(key, value)
+        } catch (_: RemoteException) {
+            false
         }
+    }
 
     private fun putInt(key: String, value: Int) {
-        withClearCallingIdentity {
-            Settings.Secure.putInt(context.contentResolver, key, value)
+        val mgr = appLockManager ?: return
+        try {
+            mgr.putSecureInt(key, value)
+        } catch (_: RemoteException) {
+            // ignore
         }
     }
 
@@ -138,20 +150,11 @@ class AppLockSecurityManager(private val context: Context) {
         return bytes.joinToString("") { "%02x".format(it) }
     }
 
-    private inline fun <T> withClearCallingIdentity(block: () -> T): T {
-        val token = Binder.clearCallingIdentity()
-        return try {
-            block()
-        } finally {
-            Binder.restoreCallingIdentity(token)
-        }
-    }
-
     companion object {
-        const val KEY_SECURITY_TYPE = "applock_security_type"
-        const val KEY_CREDENTIAL_HASH = "applock_credential_hash"
-        const val KEY_BIOMETRIC_ENABLED = "applock_biometric_enabled"
-        const val KEY_PREFER_BIOMETRIC = "applock_prefer_biometric"
+        const val KEY_SECURITY_TYPE = AppLockManager.SETTING_SECURITY_TYPE
+        const val KEY_CREDENTIAL_HASH = AppLockManager.SETTING_CREDENTIAL_HASH
+        const val KEY_BIOMETRIC_ENABLED = AppLockManager.SETTING_BIOMETRIC_ENABLED
+        const val KEY_PREFER_BIOMETRIC = AppLockManager.SETTING_PREFER_BIOMETRIC
 
         /** Legacy AppLocker / Sandbox keys — read-only fallback for upgrades. */
         private const val LEGACY_KEY_SECURITY_TYPE = "sandbox_security_type"
