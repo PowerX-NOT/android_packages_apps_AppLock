@@ -28,4 +28,13 @@ object AppLockSettingsSecure {
     fun setLockTimeoutSeconds(context: Context, timeoutSeconds: Int) {
         AppLockBinder.getOrNull(context)?.setLockTimeout(timeoutSeconds)
     }
+
+    fun isHideNotificationContentEnabled(context: Context): Boolean {
+        val manager = AppLockBinder.getOrNull(context) ?: return true
+        return manager.isHideNotificationContentEnabled
+    }
+
+    fun setHideNotificationContent(context: Context, hide: Boolean) {
+        AppLockBinder.getOrNull(context)?.setHideNotificationContent(hide)
+    }
 }

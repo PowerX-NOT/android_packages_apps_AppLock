@@ -31,6 +31,13 @@
             android:summary="@string/app_lock_relock_summary"
             android:fragment="com.android.settings.applock.AppLockRelockFragment"
             android:enabled="false" />
+
+        <SwitchPreferenceCompat
+            android:key="app_lock_hide_notifications"
+            android:title="@string/app_lock_hide_notifications_title"
+            android:summary="@string/app_lock_hide_notifications_summary"
+            android:defaultValue="true"
+            android:enabled="false" />
     </PreferenceCategory>
 
 </PreferenceScreen>

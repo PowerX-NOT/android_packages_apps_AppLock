@@ -27,12 +27,14 @@ class AppLockSettingsFragment : DashboardFragment() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferences(savedInstanceState, rootKey)
         bindEnableSwitch()
+        bindHideNotificationsSwitch()
         bindCredentialsPreference()
     }
 
     override fun onResume() {
         super.onResume()
         bindEnableSwitch()
+        bindHideNotificationsSwitch()
         refreshLockedAppsSummary()
         refreshRelockSummary()
         refreshCredentialsSummary()
@@ -67,9 +69,26 @@ class AppLockSettingsFragment : DashboardFragment() {
             true
         }
         updateDependentPreferences(manager.isEnabled)
+        bindHideNotificationsSwitch()
         refreshLockedAppsSummary()
         refreshRelockSummary()
         refreshCredentialsSummary()
+    }
+
+    private fun bindHideNotificationsSwitch() {
+        val switch = findPreference<SwitchPreferenceCompat>(KEY_HIDE_NOTIFICATIONS) ?: return
+        val manager = AppLockBinder.getOrNull(requireContext())
+        val appLockEnabled = manager?.isEnabled == true
+        switch.isEnabled = appLockEnabled
+        if (!appLockEnabled) {
+            switch.isChecked = true
+            return
+        }
+        switch.isChecked = AppLockSettingsSecure.isHideNotificationContentEnabled(requireContext())
+        switch.setOnPreferenceChangeListener { _, newValue ->
+            AppLockSettingsSecure.setHideNotificationContent(requireContext(), newValue as Boolean)
+            true
+        }
     }
 
     private fun bindCredentialsPreference() {
@@ -95,6 +114,7 @@ class AppLockSettingsFragment : DashboardFragment() {
         if (!appLockEnabled) {
             relock?.summary = getString(R.string.app_lock_relock_summary)
         }
+        findPreference<SwitchPreferenceCompat>(KEY_HIDE_NOTIFICATIONS)?.isEnabled = appLockEnabled
     }
 
     private fun refreshRelockSummary() {
@@ -144,5 +164,6 @@ class AppLockSettingsFragment : DashboardFragment() {
         private const val KEY_LOCKED_APPS = "app_lock_locked_apps"
         private const val KEY_CREDENTIALS = "app_lock_credentials"
         private const val KEY_RELOCK = "app_lock_relock"
+        private const val KEY_HIDE_NOTIFICATIONS = "app_lock_hide_notifications"
     }
 }
