@@ -3,6 +3,7 @@
     <string name="app_lock_title">App Lock</string>
     <string name="app_lock_summary">Require authentication before opening locked apps</string>
     <string name="app_lock_category_general">General</string>
+    <string name="app_lock_notifications_category">Notifications</string>
     <string name="app_lock_enable_title">App Lock</string>
     <string name="app_lock_enable_summary">Protect selected apps with a privacy password or biometrics</string>
     <string name="app_lock_locked_apps_title">Locked apps</string>

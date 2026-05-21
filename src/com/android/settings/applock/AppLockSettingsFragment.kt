@@ -7,6 +7,7 @@ package com.android.settings.applock
 import android.os.Bundle
 import android.widget.Toast
 import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
 import androidx.preference.SwitchPreferenceCompat
 import com.android.applock.R
 import com.android.internal.logging.nano.MetricsProto
@@ -76,18 +77,35 @@ class AppLockSettingsFragment : DashboardFragment() {
     }
 
     private fun bindHideNotificationsSwitch() {
-        val switch = findPreference<SwitchPreferenceCompat>(KEY_HIDE_NOTIFICATIONS) ?: return
+        val switch = ensureHideNotificationsSwitch() ?: return
+        switch.isVisible = true
         val manager = AppLockBinder.getOrNull(requireContext())
         val appLockEnabled = manager?.isEnabled == true
         switch.isEnabled = appLockEnabled
         if (!appLockEnabled) {
             switch.isChecked = true
+            switch.summary = getString(R.string.app_lock_enable_first)
             return
         }
+        switch.summary = getString(R.string.app_lock_hide_notifications_summary)
         switch.isChecked = AppLockSettingsSecure.isHideNotificationContentEnabled(requireContext())
         switch.setOnPreferenceChangeListener { _, newValue ->
             AppLockSettingsSecure.setHideNotificationContent(requireContext(), newValue as Boolean)
             true
+        }
+    }
+
+    /** Inflate from XML when possible; add programmatically if the preference is missing. */
+    private fun ensureHideNotificationsSwitch(): SwitchPreferenceCompat? {
+        findPreference<SwitchPreferenceCompat>(KEY_HIDE_NOTIFICATIONS)?.let { return it }
+        val category = findPreference<PreferenceCategory>(KEY_NOTIFICATIONS_CATEGORY)
+            ?: return null
+        return SwitchPreferenceCompat(requireContext()).apply {
+            key = KEY_HIDE_NOTIFICATIONS
+            title = getString(R.string.app_lock_hide_notifications_title)
+            summary = getString(R.string.app_lock_hide_notifications_summary)
+            isPersistent = false
+            category.addPreference(this)
         }
     }
 
@@ -114,7 +132,14 @@ class AppLockSettingsFragment : DashboardFragment() {
         if (!appLockEnabled) {
             relock?.summary = getString(R.string.app_lock_relock_summary)
         }
-        findPreference<SwitchPreferenceCompat>(KEY_HIDE_NOTIFICATIONS)?.isEnabled = appLockEnabled
+        val hideNotif = ensureHideNotificationsSwitch()
+        hideNotif?.isEnabled = appLockEnabled
+        hideNotif?.isVisible = true
+        if (!appLockEnabled) {
+            hideNotif?.summary = getString(R.string.app_lock_enable_first)
+        } else {
+            hideNotif?.summary = getString(R.string.app_lock_hide_notifications_summary)
+        }
     }
 
     private fun refreshRelockSummary() {
@@ -165,5 +190,6 @@ class AppLockSettingsFragment : DashboardFragment() {
         private const val KEY_CREDENTIALS = "app_lock_credentials"
         private const val KEY_RELOCK = "app_lock_relock"
         private const val KEY_HIDE_NOTIFICATIONS = "app_lock_hide_notifications"
+        private const val KEY_NOTIFICATIONS_CATEGORY = "app_lock_cat_notifications"
     }
 }

@@ -6,9 +6,13 @@ package com.android.settings.applock
 
 import android.app.AppLockManager
 import android.content.Context
+import android.os.RemoteException
+import android.util.Log
 
 /** Reads and writes relock policy via {@link AppLockManager} (system service). */
 object AppLockSettingsSecure {
+
+    private const val TAG = "AppLockSettingsSecure"
 
     fun getLockBehavior(context: Context): Int {
         val manager = AppLockBinder.getOrNull(context) ?: return AppLockManager.LOCK_BEHAVIOR_ON_LEAVE
@@ -31,10 +35,20 @@ object AppLockSettingsSecure {
 
     fun isHideNotificationContentEnabled(context: Context): Boolean {
         val manager = AppLockBinder.getOrNull(context) ?: return true
-        return manager.isHideNotificationContentEnabled
+        return try {
+            manager.isHideNotificationContentEnabled
+        } catch (e: RemoteException) {
+            Log.w(TAG, "isHideNotificationContentEnabled failed", e)
+            true
+        }
     }
 
     fun setHideNotificationContent(context: Context, hide: Boolean) {
-        AppLockBinder.getOrNull(context)?.setHideNotificationContent(hide)
+        val manager = AppLockBinder.getOrNull(context) ?: return
+        try {
+            manager.setHideNotificationContent(hide)
+        } catch (e: RemoteException) {
+            Log.w(TAG, "setHideNotificationContent failed", e)
+        }
     }
 }
