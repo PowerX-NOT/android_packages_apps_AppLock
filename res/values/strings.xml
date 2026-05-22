@@ -64,4 +64,5 @@
     <string name="app_lock_service_unavailable">App Lock service is not available on this build</string>
     <string name="app_lock_hide_notifications_title">Hide notification content</string>
     <string name="app_lock_hide_notifications_summary">Notification content will be hidden for locked apps</string>
+    <string name="applock_uninstall_blocked_toast">To uninstall a locked app, unlock it first</string>
 </resources>
