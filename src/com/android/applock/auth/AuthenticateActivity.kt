@@ -300,6 +300,7 @@ class AuthenticateActivity : ComponentActivity() {
 
     private fun notifySessionUnlocked() {
         val pkg = packageName ?: return
+        Log.i(TAG, "[Session] notifySessionUnlocked pkg=$pkg userId=$userId systemUnlock=$isSystemUnlock")
         (getSystemService(Context.APP_LOCK_SERVICE) as? AppLockManager)
             ?.unlockApp(pkg, userId)
     }
@@ -307,6 +308,7 @@ class AuthenticateActivity : ComponentActivity() {
     private fun unlockAndFinish() {
         if (authState == AuthState.FINISHED || isFinishing) return
         authState = AuthState.FINISHED
+        Log.i(TAG, "[Session] unlockAndFinish pkg=$packageName userId=$userId")
         notifySessionUnlocked()
         setResult(Activity.RESULT_OK, buildResultData())
         finish()
@@ -315,6 +317,7 @@ class AuthenticateActivity : ComponentActivity() {
     private fun cancelAndFinish() {
         if (authState == AuthState.FINISHED || isFinishing) return
         authState = AuthState.FINISHED
+        Log.i(TAG, "[Session] cancelAndFinish pkg=$packageName userId=$userId")
         setResult(Activity.RESULT_CANCELED, buildResultData())
         finish()
     }
