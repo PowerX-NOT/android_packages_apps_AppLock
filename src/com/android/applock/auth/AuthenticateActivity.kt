@@ -52,10 +52,11 @@ class AuthenticateActivity : ComponentActivity() {
     private var authState: AuthState = AuthState.IDLE
     private var biometricCancellationSignal: CancellationSignal? = null
     private var exitAnimationJob: Job? = null
+    /** Auto biometric runs once per activity instance (survives focus loss from the dialog). */
+    private var biometricAutoTriggered = false
 
     private val authLoadState = mutableStateOf(AuthLoadState.LOADING)
     private val isExiting = mutableStateOf(false)
-    private val hasWindowFocus = mutableStateOf(false)
     private val securitySnapshot = mutableStateOf<SecuritySnapshot?>(null)
 
     private data class SecuritySnapshot(
@@ -86,8 +87,13 @@ class AuthenticateActivity : ComponentActivity() {
         setContent {
             AppLockAuthTheme {
                 val snap = securitySnapshot.value
-                val focused = hasWindowFocus.value
                 val state = authLoadState.value
+
+                LaunchedEffect(state, snap?.securityType, snap?.isPreferBiometric) {
+                    if (state == AuthLoadState.READY && snap != null) {
+                        maybeAutoShowBiometric()
+                    }
+                }
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -109,18 +115,17 @@ class AuthenticateActivity : ComponentActivity() {
                                 onCancel = { startExitAnimation(success = false) },
                             )
                         }
-                        focused && state == AuthLoadState.READY && snap != null -> {
-                        AuthenticateScreen(
-                            securityManager = securityManager,
-                            securityType = snap.securityType,
-                            appLabel = appLabel,
-                            onSuccess = { startExitAnimation(success = true) },
-                            onCancel = { startExitAnimation(success = false) },
-                            biometricType = snap.biometricType,
-                            onBiometricClick = { showBiometricPrompt() },
-                            isPreferBiometric = snap.isPreferBiometric,
-                            isExiting = isExiting.value
-                        )
+                        state == AuthLoadState.READY && snap != null -> {
+                            AuthenticateScreen(
+                                securityManager = securityManager,
+                                securityType = snap.securityType,
+                                appLabel = appLabel,
+                                onSuccess = { startExitAnimation(success = true) },
+                                onCancel = { startExitAnimation(success = false) },
+                                biometricType = snap.biometricType,
+                                onBiometricClick = { showBiometricPrompt(userInitiated = true) },
+                                isExiting = isExiting.value
+                            )
                         }
                     }
                 }
@@ -130,13 +135,8 @@ class AuthenticateActivity : ComponentActivity() {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        Log.d(TAG, lifecycleTag("onWindowFocusChanged") + " hasFocus=" + hasFocus)
-        if (hasFocus && !hasWindowFocus.value) {
-            lifecycleScope.launch {
-                delay(UI_DEFER_MS)
-                hasWindowFocus.value = true
-            }
-        }
+        Log.d(TAG, lifecycleTag("onWindowFocusChanged") + " hasFocus=" + hasFocus
+                + " state=$authState")
     }
 
     override fun onStart() {
@@ -159,8 +159,8 @@ class AuthenticateActivity : ComponentActivity() {
         exitAnimationJob?.cancel()
         exitAnimationJob = null
         authState = AuthState.IDLE
+        biometricAutoTriggered = false
         isExiting.value = false
-        hasWindowFocus.value = false
         securitySnapshot.value = null
         reloadSecuritySnapshot()
     }
@@ -248,15 +248,32 @@ class AuthenticateActivity : ComponentActivity() {
         }
     }
 
+    private fun maybeAutoShowBiometric() {
+        val snap = securitySnapshot.value ?: return
+        if (biometricAutoTriggered || authState != AuthState.IDLE || isFinishing) {
+            return
+        }
+        if (snap.biometricType == AppLockSecurityManager.BiometricType.NONE
+                || !snap.isPreferBiometric) {
+            return
+        }
+        showBiometricPrompt(userInitiated = false)
+    }
+
     private fun startExitAnimation(success: Boolean) {
         if (authState == AuthState.EXITING || authState == AuthState.FINISHED) return
+        if (!success) {
+            // Finish immediately on cancel/back so WM does not relaunch auth while animating.
+            cancelAndFinish()
+            return
+        }
         authState = AuthState.EXITING
         isExiting.value = true
 
         exitAnimationJob?.cancel()
         exitAnimationJob = lifecycleScope.launch {
             delay(EXIT_ANIMATION_MS)
-            if (success) unlockAndFinish() else cancelAndFinish()
+            unlockAndFinish()
         }
     }
 
@@ -268,9 +285,11 @@ class AuthenticateActivity : ComponentActivity() {
         }
     }
 
-    private fun showBiometricPrompt() {
-        if (authState != AuthState.IDLE || isFinishing) return
-        authState = AuthState.PROMPT_SHOWING
+    private fun showBiometricPrompt(userInitiated: Boolean = false) {
+        if (isFinishing) return
+        if (authState == AuthState.PROMPT_SHOWING) return
+        if (authState != AuthState.IDLE) return
+        if (!userInitiated && biometricAutoTriggered) return
 
         val negativeButtonText = when (securitySnapshot.value?.securityType) {
             SecurityType.PIN -> "Use PIN"
@@ -297,6 +316,9 @@ class AuthenticateActivity : ComponentActivity() {
 
         cancelBiometricPrompt()
         authState = AuthState.PROMPT_SHOWING
+        if (!userInitiated) {
+            biometricAutoTriggered = true
+        }
         val signal = CancellationSignal()
         biometricCancellationSignal = signal
 
@@ -308,7 +330,6 @@ class AuthenticateActivity : ComponentActivity() {
         exitAnimationJob = null
         cancelBiometricPrompt()
         securitySnapshot.value = null
-        hasWindowFocus.value = false
         isExiting.value = false
     }
 
@@ -415,7 +436,6 @@ class AuthenticateActivity : ComponentActivity() {
         const val ACTION_SYSTEM_UNLOCK = "com.android.applock.action.SYSTEM_UNLOCK"
 
         private const val EXIT_ANIMATION_MS = 300L
-        private const val UI_DEFER_MS = 400L
     }
 }
 
@@ -428,19 +448,8 @@ fun AuthenticateScreen(
     onCancel: () -> Unit,
     biometricType: AppLockSecurityManager.BiometricType = AppLockSecurityManager.BiometricType.NONE,
     onBiometricClick: () -> Unit = {},
-    isPreferBiometric: Boolean = false,
     isExiting: Boolean = false
 ) {
-    var didAutoTriggerBio by remember { mutableStateOf(false) }
-    LaunchedEffect(biometricType, isPreferBiometric) {
-        if (!didAutoTriggerBio
-            && biometricType != AppLockSecurityManager.BiometricType.NONE
-            && isPreferBiometric) {
-            didAutoTriggerBio = true
-            onBiometricClick()
-        }
-    }
-
     val promptText = "Enter your privacy password to unlock $appLabel"
     
     when (securityType) {
