@@ -44,6 +44,7 @@
             android:name="com.android.applock.auth.AuthenticateActivity"
             android:exported="true"
             android:excludeFromRecents="true"
+            android:launchMode="singleTop"
             android:clearTaskOnLaunch="true"
             android:screenOrientation="portrait"
             android:configChanges="smallestScreenSize|screenSize|uiMode|screenLayout|orientation"
