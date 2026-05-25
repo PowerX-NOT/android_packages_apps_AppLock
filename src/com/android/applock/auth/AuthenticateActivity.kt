@@ -370,6 +370,14 @@ class AuthenticateActivity : ComponentActivity() {
             ?.unlockApp(pkg, userId)
     }
 
+    private fun applyUnlockFadeTransition() {
+        overrideActivityTransition(
+            Activity.OVERRIDE_TRANSITION_CLOSE,
+            android.R.anim.fade_in,
+            android.R.anim.fade_out,
+        )
+    }
+
     private fun unlockAndFinish() {
         if (authState == AuthState.FINISHED || isFinishing) return
         authState = AuthState.FINISHED
@@ -377,6 +385,7 @@ class AuthenticateActivity : ComponentActivity() {
         releasePromptResources()
         notifySessionUnlocked()
         setResult(Activity.RESULT_OK, buildResultData())
+        applyUnlockFadeTransition()
         finish()
     }
 
