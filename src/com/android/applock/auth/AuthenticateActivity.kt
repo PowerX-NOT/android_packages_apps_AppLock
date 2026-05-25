@@ -194,6 +194,9 @@ class AuthenticateActivity : ComponentActivity() {
         Log.d(TAG, lifecycleTag("onStop") + " isFinishing=" + isFinishing)
     }
 
+    private val isSystemUnlock: Boolean
+        get() = intent?.action == ACTION_SYSTEM_UNLOCK
+
     private fun lifecycleTag(phase: String): String {
         val inst = Integer.toHexString(System.identityHashCode(this))
         return "$phase pid=${Process.myPid()} inst=$inst task=$taskId state=$authState finishing=$isFinishing"
@@ -323,6 +326,11 @@ class AuthenticateActivity : ComponentActivity() {
             Log.d(TAG, lifecycleTag("onPause") + " skipping - bio prompt active")
             return
         }
+        // System unlock runs in the target app task; runtime permission dialogs pause
+        // this activity without the user leaving — do not cancel the unlock flow.
+        if (isSystemUnlock) {
+            return
+        }
         biometricCancellationSignal?.cancel()
         biometricCancellationSignal = null
         if (authState != AuthState.FINISHED) {
@@ -335,7 +343,7 @@ class AuthenticateActivity : ComponentActivity() {
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
         Log.d(TAG, lifecycleTag("onUserLeaveHint"))
-        if (authState == AuthState.IDLE) {
+        if (!isSystemUnlock && authState == AuthState.IDLE) {
             cancelAndFinish()
         }
     }
