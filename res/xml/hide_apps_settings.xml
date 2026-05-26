@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/hide_apps_title">
+
+    <SwitchPreferenceCompat
+        android:key="hide_apps_allow_notifications"
+        android:title="@string/hide_apps_allow_notifications_title"
+        android:summary="@string/hide_apps_allow_notifications_summary"
+        android:defaultValue="false" />
+
+    <PreferenceCategory
+        android:key="hide_apps_list_category"
+        android:title="@string/hide_apps_list_category" />
+
+</PreferenceScreen>

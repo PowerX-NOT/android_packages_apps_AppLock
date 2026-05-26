@@ -207,8 +207,9 @@ class AuthenticateActivity : ComponentActivity() {
     private val isSystemUnlock: Boolean
         get() = intent?.action == ACTION_SYSTEM_UNLOCK
 
-    private val isSettingsEntry: Boolean
+    private val isPrivilegedEntry: Boolean
         get() = intent?.getBooleanExtra(AppLockSettingsGate.EXTRA_SETTINGS_ENTRY, false) == true
+                || intent?.getBooleanExtra(AppLockSettingsGate.EXTRA_HIDDEN_DRAWER, false) == true
 
     private fun lifecycleTag(phase: String): String {
         val inst = Integer.toHexString(System.identityHashCode(this))
@@ -411,7 +412,7 @@ class AuthenticateActivity : ComponentActivity() {
         }
         // System unlock runs in the target app task; runtime permission dialogs pause
         // this activity without the user leaving — do not cancel the unlock flow.
-        if (isSystemUnlock || isSettingsEntry) {
+        if (isSystemUnlock || isPrivilegedEntry) {
             return
         }
         cancelBiometricPrompt()
@@ -425,7 +426,7 @@ class AuthenticateActivity : ComponentActivity() {
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
         Log.d(TAG, lifecycleTag("onUserLeaveHint"))
-        if (!isSystemUnlock && !isSettingsEntry && authState == AuthState.IDLE) {
+        if (!isSystemUnlock && !isPrivilegedEntry && authState == AuthState.IDLE) {
             cancelAndFinish()
         }
     }

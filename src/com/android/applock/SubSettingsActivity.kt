@@ -6,6 +6,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.android.settings.applock.AppLockLockedAppsFragment
 import com.android.settings.applock.AppLockRelockFragment
+import com.android.settings.applock.HideAppsSettingsFragment
 import com.android.settings.core.SubSettingLauncher
 import com.android.settingslib.collapsingtoolbar.CollapsingToolbarBaseActivity
 
@@ -43,6 +44,7 @@ class SubSettingsActivity : CollapsingToolbarBaseActivity(),
         return when (className) {
             AppLockLockedAppsFragment::class.java.name -> AppLockLockedAppsFragment()
             AppLockRelockFragment::class.java.name -> AppLockRelockFragment()
+            HideAppsSettingsFragment::class.java.name -> HideAppsSettingsFragment()
             else -> null
         }
     }

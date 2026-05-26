@@ -21,6 +21,7 @@ object AppLockSettingsGate {
 
     const val PACKAGE_NAME = "com.android.applock"
     const val EXTRA_SETTINGS_ENTRY = "settings_entry"
+    const val EXTRA_HIDDEN_DRAWER = "hidden_drawer"
 
     /** In-app auth when toggle is off and a privacy password is configured. */
     fun requiresInAppAuth(context: Context): Boolean {

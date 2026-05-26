@@ -65,4 +65,21 @@
     <string name="app_lock_hide_notifications_title">Hide notification content</string>
     <string name="app_lock_hide_notifications_summary">Notification content will be hidden for locked apps</string>
     <string name="applock_uninstall_blocked_toast">To uninstall a locked app, unlock it first</string>
+
+    <string name="hide_apps_title">Hide Apps</string>
+    <string name="hide_apps_summary">Hide apps from the launcher and system surfaces</string>
+    <string name="hide_apps_list_category">Apps</string>
+    <string name="hide_apps_allow_notifications_title">Allow notifications from hidden apps</string>
+    <string name="hide_apps_allow_notifications_summary">Receive notifications from apps that are not completely hidden</string>
+    <string name="hide_apps_empty">No launchable apps found</string>
+    <string name="hide_apps_dialog_title">Hide \"%1$s\"</string>
+    <string name="hide_apps_mode_complete_title">Completely hide</string>
+    <string name="hide_apps_mode_complete_summary">Hide from home screen, Settings, search, notifications, recents, share sheet, and package visibility</string>
+    <string name="hide_apps_mode_launcher_title">Hide</string>
+    <string name="hide_apps_mode_launcher_summary">Hide from the home screen only</string>
+    <string name="hide_apps_mode_none_title">Don\u2019t hide</string>
+    <string name="hide_apps_status_none">Visible</string>
+    <string name="hide_apps_status_launcher">Hidden from home screen</string>
+    <string name="hide_apps_status_complete">Completely hidden</string>
+    <string name="hide_apps_service_unavailable">Hide Apps service is not available on this build</string>
 </resources>
