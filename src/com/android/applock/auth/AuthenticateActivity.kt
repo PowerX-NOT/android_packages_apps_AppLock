@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import com.android.applock.auth.security.SecurityType
 import com.android.applock.auth.security.AppLockSecurityManager
+import com.android.settings.applock.AppLockSettingsGate
 import com.android.applock.auth.ui.CredentialsRequiredScreen
 import com.android.applock.auth.ui.LockScreen
 import com.android.applock.auth.ui.PasswordScreen
@@ -205,6 +206,9 @@ class AuthenticateActivity : ComponentActivity() {
 
     private val isSystemUnlock: Boolean
         get() = intent?.action == ACTION_SYSTEM_UNLOCK
+
+    private val isSettingsEntry: Boolean
+        get() = intent?.getBooleanExtra(AppLockSettingsGate.EXTRA_SETTINGS_ENTRY, false) == true
 
     private fun lifecycleTag(phase: String): String {
         val inst = Integer.toHexString(System.identityHashCode(this))
@@ -407,7 +411,7 @@ class AuthenticateActivity : ComponentActivity() {
         }
         // System unlock runs in the target app task; runtime permission dialogs pause
         // this activity without the user leaving — do not cancel the unlock flow.
-        if (isSystemUnlock) {
+        if (isSystemUnlock || isSettingsEntry) {
             return
         }
         cancelBiometricPrompt()
@@ -421,7 +425,7 @@ class AuthenticateActivity : ComponentActivity() {
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
         Log.d(TAG, lifecycleTag("onUserLeaveHint"))
-        if (!isSystemUnlock && authState == AuthState.IDLE) {
+        if (!isSystemUnlock && !isSettingsEntry && authState == AuthState.IDLE) {
             cancelAndFinish()
         }
     }
