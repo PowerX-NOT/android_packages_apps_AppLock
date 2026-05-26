@@ -27,6 +27,7 @@ class HideAppsSettingsFragment : DashboardFragment() {
     private val mainScope = CoroutineScope(Dispatchers.Main)
 
     private var pendingPackage: String? = null
+    private var isHideAppsVerified = false
 
     private val changeAuthLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -39,6 +40,7 @@ class HideAppsSettingsFragment : DashboardFragment() {
         val allow = pendingAllowNotifications
         if (allow != null) {
             pendingAllowNotifications = null
+            isHideAppsVerified = true
             HiddenAppsBinder.getOrNull(requireContext())
                 ?.setAllowNotificationsFromHiddenApps(allow)
             bindNotificationSwitch()
@@ -47,6 +49,7 @@ class HideAppsSettingsFragment : DashboardFragment() {
         val pkg = pendingPackage
         pendingPackage = null
         if (pkg != null) {
+            isHideAppsVerified = true
             showModeDialog(pkg)
         }
     }
@@ -74,7 +77,7 @@ class HideAppsSettingsFragment : DashboardFragment() {
         switch.isEnabled = true
         switch.isChecked = manager.isAllowNotificationsFromHiddenApps
         switch.setOnPreferenceChangeListener { _, newValue ->
-            if (!AppLockCredentialsHelper.isSetup(requireContext())) {
+            if (!AppLockCredentialsHelper.isSetup(requireContext()) || isHideAppsVerified) {
                 manager.setAllowNotificationsFromHiddenApps(newValue as Boolean)
                 return@setOnPreferenceChangeListener true
             }
@@ -138,6 +141,10 @@ class HideAppsSettingsFragment : DashboardFragment() {
                                     R.string.app_lock_enable_no_password,
                                     Toast.LENGTH_LONG,
                                 ).show()
+                                return@setOnPreferenceClickListener true
+                            }
+                            if (isHideAppsVerified) {
+                                showModeDialog(row.packageName)
                                 return@setOnPreferenceClickListener true
                             }
                             pendingPackage = row.packageName
